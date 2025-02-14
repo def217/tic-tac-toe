@@ -8,3 +8,7 @@
 div .row {
     height: 100px;
 }
+
+.winning-square {
+    background-color: green;
+}
