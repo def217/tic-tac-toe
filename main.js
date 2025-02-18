@@ -15,7 +15,6 @@ function changeSquare(square, board) {
     }
 }
 
-
 function addToArray(square, player, board) {
     const playerPlace = square.id.split("square-")[1].split("-");
     board[playerPlace[0] - 1][playerPlace[1] - 1] = player;
@@ -86,6 +85,41 @@ function gameWon(player, winningSquares) {
     winningText.innerHTML = `${player} has won!`
     gameOver = true;
     drawWinningSquares(winningSquares);
+    resetSettings()
+}
+
+function gameDraw() {
+    const winningText = document.querySelector('h4');
+    winningText.innerHTML = 'Its a draw!'
+    gameOver = true;
+    resetSettings()
+}
+
+function resetSettings() {
+    const resetBtn = document.createElement("button");
+    resetBtn.className = "btn btn-outline-primary mt-5";
+    resetBtn.innerHTML = "Restart";
+
+    resetBtn.onclick = function () {
+        document.querySelector("#grid").remove();
+        document.querySelector("#settings").hidden = false;
+        resetBtn.remove();
+    }
+    container.appendChild(resetBtn);
+
+    gridSize = null;
+    gameType = null;
+
+    document.querySelectorAll(".btn-outline-success").forEach(button => {
+        button.classList.remove("btn-outline-success");
+        button.classList.add("btn-outline-primary");
+        button.disabled = false;
+
+        const parentRow = button.closest(".row");
+        parentRow.querySelectorAll(".btn-outline-primary").forEach(btn => {
+            btn.disabled = false;
+        });
+    });
 }
 
 function drawWinningSquares(winningSquares) {
@@ -93,41 +127,39 @@ function drawWinningSquares(winningSquares) {
     const squareElements = document.querySelectorAll(squares);
 
     for (let i = 0; i < squareElements.length; i++) {
-        squareElements[i].classList.add("winning-square");    
+        squareElements[i].classList.add("winning-square");
     }
-}
-
-function gameDraw() {
-    const winningText = document.querySelector('h4');
-    winningText.innerHTML = 'Its a draw!'
-    gameOver = true;
 }
 
 function drawBoard() {
     removeSettingsDiv();
+    const gameDiv = document.createElement("div");
+    gameDiv.id = "grid";
+
     const heading = document.createElement("h4");
     heading.innerHTML = "Start the game by pressing on one of the squares.";
-    container.appendChild(heading);
+    gameDiv.appendChild(heading);
 
     let board = createBoardArray();
     for (let row = 1; row <= gridSize; row++) {
         const rowDiv = document.createElement("div");
         rowDiv.className = "row d-flex w-100";
-    
+
         for (let col = 1; col <= gridSize; col++) {
             const square = document.createElement("div");
             square.id = `square-${row}-${col}`;
             square.className = "col border align-center";
-            square.onclick = function () {
-                changeSquare(square, board);
-            };
+            square.onclick = () => changeSquare(square, board);
             rowDiv.appendChild(square);
         }
-        container.appendChild(rowDiv);
+        gameDiv.appendChild(rowDiv);
     }
+    container.appendChild(gameDiv);
 }
 
-const removeSettingsDiv = () => document.querySelector("#settings").remove();
+const removeSettingsDiv = () => {
+    document.querySelector("#settings").hidden = true;
+}
 
 function createBoardArray() {
     if (!gridSize) {
@@ -143,7 +175,7 @@ function createBoardArray() {
 }
 
 document.querySelectorAll(".btn-outline-primary").forEach(button => {
-    button.addEventListener("click", function() {
+    button.addEventListener("click", function () {
         this.classList.add("btn-outline-success");
 
         const parentRow = this.closest(".row");
